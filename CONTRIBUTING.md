@@ -23,22 +23,12 @@ Then build the melonJS source by running:
     $ npm run build
 
 The generated files will be available under the `build` directory :
-- `melonjs.module.js` : plain ES6 module
-- `melonjs.mjs` : a ES6 chunk directory used for tree-shaking
-
-If you need to create the corresponding typing you can use the follwing :
-
-    $ npm run types
-
-This will generate all the `.d.ts` file under the `dist/types` directory.
+- `index.js` : a tree-shakeable ES6 Module Directory
+- `index.d.ts` : typescript declaration files
 
 To run the melonJS test suite simply use the following:
 
     $ npm run test
-
-This will run the jasmine spec tests with the output displayed on the shell. Do
-note that the latest Chrome version is required, as the test unit will run the
-Browser in a headless mode (in case of failed tests, upgrade your browser).
 
 Last but not least, if you really want to contribute, but not sure how, you can
 always check our [discussions](https://github.com/melonjs/melonJS/discussions/categories/ideas) list to get some idea on where to start.
@@ -51,15 +41,11 @@ Similarly, you can build your own copy of the docs locally by running :
 
 The documentation will be generated under the `docs` directory, and can be accessed by opening index.html in your web browser.
 
-## WIP Builds
-
-latest WIP builds are available under [`dist`](dist/) in the [master](https://github.com/melonjs/melonJS/tree/master) branch.
-
 ## Questions, need help ?
 
 If you need technical support, you can contact us through the following channels :
 * Forums: with melonJS 2 we moved to a new discourse [forum](https://melonjs.discourse.group), but we can still also find the previous one [here](http://www.html5gamedevs.com/forum/32-melonjs/)
-* Chat: come and chat with us on [discord](https://discord.gg/aur7JMk), or [gitter](https://gitter.im/melonjs/public)
+* Chat: come and chat with us on [discord](https://discord.gg/aur7JMk)
 * we tried to keep our [wikipage](https://github.com/melonjs/melonJS/wiki) up-to-date with useful links, tutorials, and anything related melonJS.
 
 ## Contributors

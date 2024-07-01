@@ -1,5 +1,5 @@
 import { fontList } from "../cache.js";
-import { isDataUrl } from "../../utils/string.js";
+import { isDataUrl } from "../../utils/string.ts";
 
 /**
  * parse/preload a font face
@@ -28,7 +28,7 @@ export function preloadFontFace(data, onload, onerror) {
 
 	if (typeof fontFaceSet !== "undefined") {
 		// create a new font face
-		let font = new FontFace(data.name, data.src);
+		const font = new FontFace(data.name, data.src);
 		// loading promise
 		font.load().then(
 			() => {

@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-
 import pool from "./../../../system/pooling.js";
 import TMXLayer from "./../TMXLayer.js";
 import Bounds from "./../../../physics/bounds.js";
@@ -46,7 +44,8 @@ export default class TMXRenderer {
 	 * @returns {Bounds}
 	 */
 	getBounds(layer) {
-		let bounds = layer instanceof TMXLayer ? pool.pull("Bounds") : this.bounds;
+		const bounds =
+			layer instanceof TMXLayer ? pool.pull("Bounds") : this.bounds;
 		bounds.setMinMax(
 			0,
 			0,
@@ -85,7 +84,7 @@ export default class TMXRenderer {
 	 * @param {number} y - Y coordinate where to draw the tile
 	 * @param {Tile} tile - the tile object to draw
 	 */
-	drawTile(renderer, x, y, tile) {}
+	drawTile() {}
 
 	/**
 	 * draw the given TMX Layer for the given area
@@ -93,7 +92,5 @@ export default class TMXRenderer {
 	 * @param {TMXLayer} layer - a TMX Layer object
 	 * @param {Rect} rect - the area of the layer to draw
 	 */
-	drawTileLayer(renderer, layer, rect) {}
+	drawTileLayer() {}
 }
-
-/* eslint-enable no-unused-vars */

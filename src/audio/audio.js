@@ -1,7 +1,7 @@
 // external import
 import { Howl, Howler } from "howler";
 import { clamp } from "./../math/math.js";
-import { isDataUrl } from "./../utils/string.js";
+import { isDataUrl } from "./../utils/string.ts";
 
 /**
  * additional import for TypeScript
@@ -9,14 +9,10 @@ import { isDataUrl } from "./../utils/string.js";
  */
 
 /**
- * @namespace audio
- */
-
-/**
  * audio channel list
  * @ignore
  */
-let audioTracks = {};
+const audioTracks = {};
 
 /**
  * current active track
@@ -40,21 +36,20 @@ let audioExts = [];
  * event listener callback on load error
  * @ignore
  */
-let soundLoadError = function (sound_name, onerror_cb) {
+const soundLoadError = function (sound_name, onerror_cb) {
 	// check the retry counter
 	if (retry_counter++ > 3) {
 		// something went wrong
-		let errmsg = "melonJS: failed loading " + sound_name;
+		const errmsg = "melonJS: failed loading " + sound_name;
 		if (stopOnAudioError === false) {
 			// disable audio
 			disable();
 			// call error callback if defined
-			if (onerror_cb) {
-				onerror_cb();
-			}
+			onerror_cb?.();
 			// warning
 			console.log(errmsg + ", disabling audio");
 		} else {
+			onerror_cb?.();
 			// throw an exception and stop everything !
 			throw new Error(errmsg);
 		}
@@ -69,9 +64,7 @@ let soundLoadError = function (sound_name, onerror_cb) {
  * if true, melonJS will throw an exception and stop loading<br>
  * if false, melonJS will disable sounds and output a warning message
  * in the console<br>
- * @type {boolean}
  * @default true
- * @memberof audio
  */
 export let stopOnAudioError = true;
 
@@ -82,7 +75,6 @@ export let stopOnAudioError = true;
  * webm has nearly full browser coverage with a great combination of compression and quality, and mp3 will fallback gracefully for other browsers.
  * It is important to remember that melonJS selects the first compatible sound based on the list of extensions and given order passed here.
  * So if you want webm to be used before mp3, you need to put the audio format in that order.
- * @memberof audio
  * @param {string} [format="mp3"] - audio format to prioritize ("mp3"|"mpeg"|"opus"|"ogg"|"oga"|"wav"|"aac"|"caf"|"m4a"|"m4b"|"mp4"|"weba"|"webm"|"dolby"|"flac")
  * @returns {boolean} Indicates whether audio initialization was successful
  * @example
@@ -101,7 +93,6 @@ export function init(format = "mp3") {
 
 /**
  * check if the given audio format is supported
- * @memberof audio
  * @param {"mp3"|"mpeg"|"opus"|"ogg"|"oga"|"wav"|"aac"|"caf"|"m4a"|"m4b"|"mp4"|"weba"|"webm"|"dolby"|"flac"} codec - the audio format to check for support
  * @returns {boolean} return true if the given audio format is supported
  */
@@ -111,7 +102,6 @@ export function hasFormat(codec) {
 
 /**
  * check if audio (HTML5 or WebAudio) is supported
- * @memberof audio
  * @returns {boolean} return true if audio (HTML5 or WebAudio) is supported
  */
 export function hasAudio() {
@@ -121,7 +111,6 @@ export function hasAudio() {
 /**
  * enable audio output <br>
  * only useful if audio supported and previously disabled through
- * @memberof audio
  * @see audio.disable
  */
 export function enable() {
@@ -130,7 +119,6 @@ export function enable() {
 
 /**
  * disable audio output
- * @memberof audio
  */
 export function disable() {
 	muteAll();
@@ -138,7 +126,6 @@ export function disable() {
 
 /**
  * Load an audio file
- * @memberof audio
  * @param {Asset} sound
  * @param {Function} [onloadcb] - function to be called when the resource is loaded
  * @param {Function} [onerrorcb] - function to be called in case of error
@@ -146,7 +133,7 @@ export function disable() {
  * @returns {number} the amount of asset loaded (always 1 if successfull)
  */
 export function load(sound, onloadcb, onerrorcb, settings = {}) {
-	let urls = [];
+	const urls = [];
 	if (audioExts.length === 0) {
 		throw new Error(
 			"target audio extension(s) should be set through me.audio.init() before calling the preloader.",
@@ -183,7 +170,6 @@ export function load(sound, onloadcb, onerrorcb, settings = {}) {
 
 /**
  * play the specified sound
- * @memberof audio
  * @param {string} sound_name - audio clip name - case sensitive
  * @param {boolean} [loop=false] - loop audio
  * @param {Function} [onend] - Function to call when sound instance ends playing.
@@ -200,9 +186,9 @@ export function load(sound, onloadcb, onerrorcb, settings = {}) {
  * me.audio.play("gameover_sfx", false, null, 0.5);
  */
 export function play(sound_name, loop = false, onend, volume) {
-	let sound = audioTracks[sound_name];
+	const sound = audioTracks[sound_name];
 	if (sound && typeof sound !== "undefined") {
-		let id = sound.play();
+		const id = sound.play();
 		if (typeof loop === "boolean") {
 			// arg[0] can take different types in howler 2.0
 			sound.loop(loop, id);
@@ -226,7 +212,6 @@ export function play(sound_name, loop = false, onend, volume) {
 
 /**
  * Fade a currently playing sound between two volumee.
- * @memberof audio
  * @param {string} sound_name - audio clip name - case sensitive
  * @param {number} from - Volume to fade from (0.0 to 1.0).
  * @param {number} to - Volume to fade to (0.0 to 1.0).
@@ -234,7 +219,7 @@ export function play(sound_name, loop = false, onend, volume) {
  * @param {number} [id] - the sound instance ID. If none is passed, all sounds in group will fade.
  */
 export function fade(sound_name, from, to, duration, id) {
-	let sound = audioTracks[sound_name];
+	const sound = audioTracks[sound_name];
 	if (sound && typeof sound !== "undefined") {
 		sound.fade(from, to, duration, id);
 	} else {
@@ -244,7 +229,6 @@ export function fade(sound_name, from, to, duration, id) {
 
 /**
  * get/set the position of playback for a sound.
- * @memberof audio
  * @param {string} sound_name - audio clip name - case sensitive
  * @param {number} [seek] - the position to move current playback to (in seconds).
  * @param {number} [id] - the sound instance ID. If none is passed, all sounds in group will changed.
@@ -256,7 +240,7 @@ export function fade(sound_name, from, to, duration, id) {
  * me.audio.seek("dst-gameforest", 0);
  */
 export function seek(sound_name, ...args) {
-	let sound = audioTracks[sound_name];
+	const sound = audioTracks[sound_name];
 	if (sound && typeof sound !== "undefined") {
 		return sound.seek(...args);
 	} else {
@@ -266,7 +250,6 @@ export function seek(sound_name, ...args) {
 
 /**
  * get or set the rate of playback for a sound.
- * @memberof audio
  * @param {string} sound_name - audio clip name - case sensitive
  * @param {number} [rate] - playback rate : 0.5 to 4.0, with 1.0 being normal speed.
  * @param {number} [id] - the sound instance ID. If none is passed, all sounds in group will be changed.
@@ -278,7 +261,7 @@ export function seek(sound_name, ...args) {
  * me.audio.rate("dst-gameforest", 2.0);
  */
 export function rate(sound_name, ...args) {
-	let sound = audioTracks[sound_name];
+	const sound = audioTracks[sound_name];
 	if (sound && typeof sound !== "undefined") {
 		return sound.rate(...args);
 	} else {
@@ -288,7 +271,6 @@ export function rate(sound_name, ...args) {
 
 /**
  * get or set the stereo panning for the specified sound.
- * @memberof audio
  * @param {string} sound_name - audio clip name - case sensitive
  * @param {number} [pan] - the panning value - A value of -1.0 is all the way left and 1.0 is all the way right.
  * @param {number} [id] - the sound instance ID. If none is passed, all sounds in group will be changed.
@@ -297,7 +279,7 @@ export function rate(sound_name, ...args) {
  * me.audio.stereo("cling", -1);
  */
 export function stereo(sound_name, pan, id) {
-	let sound = audioTracks[sound_name];
+	const sound = audioTracks[sound_name];
 	if (sound && typeof sound !== "undefined") {
 		return sound.stereo(pan, id);
 	} else {
@@ -307,7 +289,6 @@ export function stereo(sound_name, pan, id) {
 
 /**
  * get or set the 3D spatial position for the specified sound.
- * @memberof audio
  * @param {string} sound_name - audio clip name - case sensitive
  * @param  {Number} x - the x-position of the audio source.
  * @param  {Number} y - the y-position of the audio source.
@@ -316,7 +297,7 @@ export function stereo(sound_name, pan, id) {
  * @return {Array} the current 3D spatial position: [x, y, z]
  */
 export function position(sound_name, x, y, z, id) {
-	let sound = audioTracks[sound_name];
+	const sound = audioTracks[sound_name];
 	if (sound && typeof sound !== "undefined") {
 		return sound.pos(x, y, z, id);
 	} else {
@@ -327,7 +308,6 @@ export function position(sound_name, x, y, z, id) {
 /**
  * Get/set the direction the audio source is pointing in the 3D cartesian coordinate space.
  * Depending on how direction the sound is, based on the `cone` attributes, a sound pointing away from the listener can be quiet or silent.
- * @memberof audio
  * @param {string} sound_name - audio clip name - case sensitive
  * @param  {Number} x - the x-orientation of the audio source.
  * @param  {Number} y - the y-orientation of the audio source.
@@ -336,7 +316,7 @@ export function position(sound_name, x, y, z, id) {
  * @return {Array} the current 3D spatial orientation: [x, y, z]
  */
 export function orientation(sound_name, x, y, z, id) {
-	let sound = audioTracks[sound_name];
+	const sound = audioTracks[sound_name];
 	if (sound && typeof sound !== "undefined") {
 		return sound.orientation(x, y, z, id);
 	} else {
@@ -347,7 +327,6 @@ export function orientation(sound_name, x, y, z, id) {
 /**
  * get or set the panner node's attributes for a sound or group of sounds.
  * See {@link https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Web_audio_spatialization_basics#creating_a_panner_node}
- * @memberof audio
  * @param {string} sound_name - audio clip name - case sensitive
  * @param {object} [attribute] - the panner attributes to set
  * @param {string} [settings.coneInnerAngle=360] - A parameter for directional audio sources, this is an angle, in degrees, inside of which there will be no volume reduction.
@@ -369,7 +348,7 @@ export function orientation(sound_name, x, y, z, id) {
  * });
  */
 export function panner(sound_name, attributes, id) {
-	let sound = audioTracks[sound_name];
+	const sound = audioTracks[sound_name];
 	if (sound && typeof sound !== "undefined") {
 		return sound.pannerAttr(attributes, id);
 	} else {
@@ -379,7 +358,6 @@ export function panner(sound_name, attributes, id) {
 
 /**
  * stop the specified sound on all channels
- * @memberof audio
  * @param {string} [sound_name] - audio clip name (case sensitive). If none is passed, all sounds are stopped.
  * @param {number} [id] - the sound instance ID. If none is passed, all sounds in group will stop.
  * @example
@@ -387,7 +365,7 @@ export function panner(sound_name, attributes, id) {
  */
 export function stop(sound_name, id) {
 	if (typeof sound_name !== "undefined") {
-		let sound = audioTracks[sound_name];
+		const sound = audioTracks[sound_name];
 		if (sound && typeof sound !== "undefined") {
 			sound.stop(id);
 			// remove the defined onend callback (if any defined)
@@ -403,14 +381,13 @@ export function stop(sound_name, id) {
 /**
  * pause the specified sound on all channels<br>
  * this function does not reset the currentTime property
- * @memberof audio
  * @param {string} sound_name - audio clip name - case sensitive
  * @param {number} [id] - the sound instance ID. If none is passed, all sounds in group will pause.
  * @example
  * me.audio.pause("cling");
  */
 export function pause(sound_name, id) {
-	let sound = audioTracks[sound_name];
+	const sound = audioTracks[sound_name];
 	if (sound && typeof sound !== "undefined") {
 		sound.pause(id);
 	} else {
@@ -420,7 +397,6 @@ export function pause(sound_name, id) {
 
 /**
  * resume the specified sound on all channels<br>
- * @memberof audio
  * @param {string} sound_name - audio clip name - case sensitive
  * @param {number} [id] - the sound instance ID. If none is passed, all sounds in group will resume.
  * @example
@@ -434,7 +410,7 @@ export function pause(sound_name, id) {
  * me.audio.resume("myClip", id);
  */
 export function resume(sound_name, id) {
-	let sound = audioTracks[sound_name];
+	const sound = audioTracks[sound_name];
 	if (sound && typeof sound !== "undefined") {
 		sound.play(id);
 	} else {
@@ -446,7 +422,6 @@ export function resume(sound_name, id) {
  * play the specified audio track<br>
  * this function automatically set the loop property to true<br>
  * and keep track of the current sound being played.
- * @memberof audio
  * @param {string} sound_name - audio track name - case sensitive
  * @param {number} [volume=default] - Float specifying volume (0.0 - 1.0 values accepted).
  * @returns {number} the sound instance ID.
@@ -460,7 +435,6 @@ export function playTrack(sound_name, volume) {
 
 /**
  * stop the current audio track
- * @memberof audio
  * @see audio.playTrack
  * @example
  * // play a awesome music
@@ -477,7 +451,6 @@ export function stopTrack() {
 
 /**
  * pause the current audio track
- * @memberof audio
  * @example
  * me.audio.pauseTrack();
  */
@@ -489,7 +462,6 @@ export function pauseTrack() {
 
 /**
  * resume the previously paused audio track
- * @memberof audio
  * @example
  * // play an awesome music
  * me.audio.playTrack("awesome_music");
@@ -506,7 +478,6 @@ export function resumeTrack() {
 
 /**
  * returns the current track Id
- * @memberof audio
  * @returns {string} audio track name
  */
 export function getCurrentTrack() {
@@ -515,7 +486,6 @@ export function getCurrentTrack() {
 
 /**
  * set the default global volume
- * @memberof audio
  * @param {number} volume - Float specifying volume (0.0 - 1.0 values accepted).
  */
 export function setVolume(volume) {
@@ -524,7 +494,6 @@ export function setVolume(volume) {
 
 /**
  * get the default global volume
- * @memberof audio
  * @returns {number} current volume value in Float [0.0 - 1.0] .
  */
 export function getVolume() {
@@ -533,7 +502,6 @@ export function getVolume() {
 
 /**
  * mute or unmute the specified sound, but does not pause the playback.
- * @memberof audio
  * @param {string} sound_name - audio clip name - case sensitive
  * @param {number} [id] - the sound instance ID. If none is passed, all sounds in group will mute.
  * @param {boolean} [mute=true] - True to mute and false to unmute
@@ -542,7 +510,7 @@ export function getVolume() {
  * me.audio.mute("awesome_music");
  */
 export function mute(sound_name, id, mute = true) {
-	let sound = audioTracks[sound_name];
+	const sound = audioTracks[sound_name];
 	if (sound && typeof sound !== "undefined") {
 		sound.mute(mute, id);
 	} else {
@@ -552,7 +520,6 @@ export function mute(sound_name, id, mute = true) {
 
 /**
  * unmute the specified sound
- * @memberof audio
  * @param {string} sound_name - audio clip name
  * @param {number} [id] - the sound instance ID. If none is passed, all sounds in group will unmute.
  */
@@ -562,7 +529,6 @@ export function unmute(sound_name, id) {
 
 /**
  * mute all audio
- * @memberof audio
  */
 export function muteAll() {
 	Howler.mute(true);
@@ -570,7 +536,6 @@ export function muteAll() {
 
 /**
  * unmute all audio
- * @memberof audio
  */
 export function unmuteAll() {
 	Howler.mute(false);
@@ -578,7 +543,6 @@ export function unmuteAll() {
 
 /**
  * Returns true if audio is muted globally.
- * @memberof audio
  * @returns {boolean} true if audio is muted globally
  */
 export function muted() {
@@ -587,7 +551,6 @@ export function muted() {
 
 /**
  * unload specified audio track to free memory
- * @memberof audio
  * @param {string} sound_name - audio track name - case sensitive
  * @returns {boolean} true if unloaded
  * @example
@@ -606,12 +569,11 @@ export function unload(sound_name) {
 
 /**
  * unload all audio to free memory
- * @memberof audio
  * @example
  * me.audio.unloadAll();
  */
 export function unloadAll() {
-	for (let sound_name in audioTracks) {
+	for (const sound_name in audioTracks) {
 		if (audioTracks.hasOwnProperty(sound_name)) {
 			unload(sound_name);
 		}

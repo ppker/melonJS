@@ -79,10 +79,10 @@ function addMapping(id, mapping) {
 }
 
 // binding list
-let bindings = {};
+const bindings = {};
 
 // mapping list
-let remap = new Map();
+const remap = new Map();
 
 let updateEventHandler;
 
@@ -146,12 +146,12 @@ let updateEventHandler;
  * Update gamepad status
  * @ignore
  */
-let updateGamepads = function () {
-	let gamepads = navigator.getGamepads();
+const updateGamepads = function () {
+	const gamepads = navigator.getGamepads();
 
 	// Trigger button bindings
 	Object.keys(bindings).forEach((index) => {
-		let gamepad = gamepads[index];
+		const gamepad = gamepads[index];
 		if (!gamepad) {
 			return;
 		}
@@ -161,11 +161,11 @@ let updateGamepads = function () {
 			mapping = remap.get(gamepad.id);
 		}
 
-		let binding = bindings[index];
+		const binding = bindings[index];
 
 		// Iterate all buttons that have active bindings
 		Object.keys(binding.buttons).forEach((button) => {
-			let last = binding.buttons[button];
+			const last = binding.buttons[button];
 			let mapped_button = button;
 			let mapped_axis = -1;
 
@@ -185,7 +185,7 @@ let updateGamepads = function () {
 			// Remap an axis to an analog button
 			if (mapping) {
 				if (mapped_axis >= 0) {
-					let value = mapping.normalize_fn(
+					const value = mapping.normalize_fn(
 						gamepad.axes[mapped_axis],
 						-1,
 						+button,
@@ -215,7 +215,7 @@ let updateGamepads = function () {
 
 		// Iterate all axes that have active bindings
 		Object.keys(binding.axes).forEach((axis) => {
-			let last = binding.axes[axis];
+			const last = binding.axes[axis];
 			let mapped_axis = axis;
 
 			// Remap buttons if necessary
@@ -240,7 +240,7 @@ let updateGamepads = function () {
 			if (last[range].keyCode === 0) {
 				return;
 			}
-			let pressed =
+			const pressed =
 				Math.abs(value) >= deadzone + Math.abs(last[range].threshold);
 
 			event.emit(event.GAMEPAD_UPDATE, index, "axes", +axis, value);
@@ -298,11 +298,8 @@ if (
 
 /**
  * Namespace for standard gamepad mapping constants
- * @public
- * @namespace GAMEPAD
- * @memberof input
  */
-export let GAMEPAD = {
+export const GAMEPAD = {
 	/**
 	 * Standard gamepad mapping information for axes<br>
 	 * <ul>
@@ -310,10 +307,6 @@ export let GAMEPAD = {
 	 *   <li>Right control stick: <code>RX</code> (horizontal), <code>RY</code> (vertical)</li>
 	 *   <li>Extras: <code>EXTRA_1</code>, <code>EXTRA_2</code>, <code>EXTRA_3</code>, <code>EXTRA_4</code></li>
 	 * </ul>
-	 * @public
-	 * @name AXES
-	 * @enum {number}
-	 * @memberof input.GAMEPAD
 	 * @see https://w3c.github.io/gamepad/#remapping
 	 */
 	AXES: {
@@ -337,10 +330,6 @@ export let GAMEPAD = {
 	 *   <li>Navigation: <code>SELECT</code> (<code>BACK</code>), <code>START</code> (<code>FORWARD</code>), <code>HOME</code></li>
 	 *   <li>Extras: <code>EXTRA_1</code>, <code>EXTRA_2</code>, <code>EXTRA_3</code>, <code>EXTRA_4</code></li>
 	 * </ul>
-	 * @public
-	 * @name BUTTONS
-	 * @enum {number}
-	 * @memberof input.GAMEPAD
 	 * @see https://w3c.github.io/gamepad/#remapping
 	 */
 	BUTTONS: {
@@ -372,13 +361,10 @@ export let GAMEPAD = {
 
 /**
  * Associate a gamepad event to a keycode
- * @name bindGamepad
- * @memberof input
- * @public
  * @param {number} index - Gamepad index
  * @param {object} button - Button/Axis definition
  * @param {string} button.type - "buttons" or "axes"
- * @param {number} button.code - button or axis code id (See {@link input.GAMEPAD.BUTTONS}, {@link input.GAMEPAD.AXES})
+ * @param {number} button.code - button or axis code id (See {@link input.GAMEPAD})
  * @param {number} [button.threshold=1] - value indicating when the axis should trigger the keycode (e.g. -0.5 or 0.5)
  * @param {number} keyCode - (See {@link input.KEY})
  * @example
@@ -413,13 +399,13 @@ export function bindGamepad(index, button, keyCode) {
 		};
 	}
 
-	let mapping = {
+	const mapping = {
 		keyCode: keyCode,
 		value: 0,
 		pressed: false,
 		threshold: button.threshold, // can be undefined
 	};
-	let binding = bindings[index][button.type];
+	const binding = bindings[index][button.type];
 
 	// Map the gamepad button or axis to the keycode
 	if (button.type === "buttons") {
@@ -427,12 +413,12 @@ export function bindGamepad(index, button, keyCode) {
 		binding[button.code] = mapping;
 	} else if (button.type === "axes") {
 		// normalize threshold into a value that can represent both side of the axis
-		let range = Math.sign(button.threshold) || 1;
+		const range = Math.sign(button.threshold) || 1;
 		// axes are defined using two objects; one for negative and one for positive
 		if (!binding[button.code]) {
 			binding[button.code] = {};
 		}
-		let axes = binding[button.code];
+		const axes = binding[button.code];
 		axes[range] = mapping;
 
 		// Ensure the opposite axis exists
@@ -449,11 +435,8 @@ export function bindGamepad(index, button, keyCode) {
 
 /**
  * unbind the defined keycode
- * @name unbindGamepad
- * @memberof input
- * @public
  * @param {number} index - Gamepad index
- * @param {number} button - (See {@link input.GAMEPAD.BUTTONS})
+ * @param {number} button - (See {@link input.GAMEPAD})
  * @example
  * me.input.unbindGamepad(0, me.input.GAMEPAD.BUTTONS.FACE_1);
  */
@@ -467,9 +450,6 @@ export function unbindGamepad(index, button) {
 /**
  * Set deadzone for analog gamepad inputs<br>
  * The default deadzone is 0.1 (10%) Analog values less than this will be ignored
- * @name setGamepadDeadzone
- * @memberof input
- * @public
  * @param {number} value - Deadzone value
  */
 export function setGamepadDeadzone(value) {
@@ -480,9 +460,6 @@ export function setGamepadDeadzone(value) {
  * specify a custom mapping for a specific gamepad id<br>
  * see below for the default mapping : <br>
  * <center><img src="images/gamepad_diagram.png"/></center><br>
- * @name setGamepadMapping
- * @memberof input
- * @public
  * @param {string} id - Gamepad id string
  * @param {object} mapping - A hash table
  * @param {number[]} mapping.axes - Standard analog control stick axis locations
@@ -513,4 +490,4 @@ export function setGamepadDeadzone(value) {
  *   }
  * });
  */
-export let setGamepadMapping = addMapping;
+export const setGamepadMapping = addMapping;

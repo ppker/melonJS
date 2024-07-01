@@ -1,7 +1,7 @@
 import { imgList } from "../cache.js";
 import { fetchData } from "./fetchdata.js";
-import * as fileUtil from "./../../utils/file.js";
 import { parseCompressedImage } from "./compressed_textures/compressed_image.js";
+import { getExtension } from "../../utils/file.ts";
 
 /**
  * parse/preload an image
@@ -25,11 +25,11 @@ export function preloadImage(img, onload, onerror, settings) {
 		return 0;
 	}
 
-	let sources = Array.isArray(img.src) ? img.src : [img.src];
+	const sources = Array.isArray(img.src) ? img.src : [img.src];
 	let isFormatSupported = false;
 
 	for (const imgPath of sources) {
-		const imgExt = fileUtil.getExtension(imgPath);
+		const imgExt = getExtension(imgPath);
 		// loop will stop as soon as a first supported format is detected
 		switch (imgExt) {
 			// Compressed texture

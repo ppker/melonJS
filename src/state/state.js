@@ -1,9 +1,9 @@
 import { pauseTrack, resumeTrack } from "./../audio/audio.js";
-import * as fctUtil from "./../utils/function.js";
 import * as event from "./../system/event.js";
 import { game } from "../index.js";
 import Stage from "./../state/stage.js";
 import DefaultLoadingScreen from "./../loader/loadingscreen.js";
+import { defer } from "../utils/function.ts";
 
 // current state
 let _state = -1;
@@ -15,10 +15,10 @@ let _animFrameId = -1;
 let _isPaused = false;
 
 // list of stages
-let _stages = {};
+const _stages = {};
 
 // fading transition parameters between screen
-let _fade = {
+const _fade = {
 	color: "",
 	duration: 0,
 };
@@ -138,7 +138,7 @@ event.once(event.BOOT, () => {
  * a State Manager (state machine)
  * @namespace state
  */
-let state = {
+const state = {
 	/**
 	 * default state ID for Loading Stage
 	 * @constant
@@ -501,7 +501,7 @@ let state = {
 					game.viewport.fadeOut(_fade.color, _fade.duration);
 				};
 				game.viewport.fadeIn(_fade.color, _fade.duration, function () {
-					fctUtil.defer(_switchState, this, state);
+					defer(_switchState, this, state);
 				});
 			}
 			// else just switch without any effects
@@ -511,7 +511,7 @@ let state = {
 				if (forceChange === true) {
 					_switchState(state);
 				} else {
-					fctUtil.defer(_switchState, this, state);
+					defer(_switchState, this, state);
 				}
 			}
 		}

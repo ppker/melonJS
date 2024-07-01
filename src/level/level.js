@@ -1,5 +1,4 @@
-import { resetGUID } from "./../utils/utils.js";
-import { defer } from "../utils/function.js";
+import { resetGUID } from "./../utils/utils.ts";
 import * as event from "./../system/event.js";
 import state from "./../state/state.js";
 import { getTMX } from "./../loader/loader.js";
@@ -7,9 +6,9 @@ import { game } from "../index.js";
 import TMXTileMap from "./tiled/TMXTileMap.js";
 
 // our levels
-let levels = {};
+const levels = {};
 // level index table
-let levelIdx = [];
+const levelIdx = [];
 // current level index
 let currentLevelIdx = 0;
 
@@ -63,7 +62,7 @@ function safeLoadLevel(levelId, options, restart) {
  * @ignore
  */
 function loadTMXLevel(levelId, container, flatten, setViewportBounds) {
-	let level = levels[levelId];
+	const level = levels[levelId];
 
 	// reset the GUID generator
 	// and pass the level id as parameter
@@ -81,7 +80,7 @@ function loadTMXLevel(levelId, container, flatten, setViewportBounds) {
  * @namespace level
  */
 
-let level = {
+const level = {
 	/**
 	 * add a level into the game manager (usually called by the preloader)
 	 * @name add
@@ -175,14 +174,16 @@ let level = {
 
 		if (levels[levelId] instanceof TMXTileMap) {
 			// check the status of the state mngr
-			let wasRunning = state.isRunning();
+			const wasRunning = state.isRunning();
 
 			if (wasRunning) {
 				// stop the game loop to avoid
 				// some silly side effects
 				state.stop();
 
-				defer(safeLoadLevel, this, levelId, options, true);
+				setTimeout(() => {
+					safeLoadLevel(levelId, options, true);
+				});
 			} else {
 				safeLoadLevel(levelId, options);
 			}

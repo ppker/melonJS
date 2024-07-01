@@ -1,4 +1,3 @@
-import * as fileUtil from "./../utils/file.js";
 import * as event from "./../system/event.js";
 import * as audio from "./../audio/audio.js";
 import state from "./../state/state.js";
@@ -18,6 +17,7 @@ import { preloadBinary } from "./parsers/binary.js";
 import { preloadJavascript } from "./parsers/script.js";
 import { preloadVideo } from "./parsers/video.js";
 import { warning } from "../lang/console.js";
+import { getBasename } from "../utils/file.ts";
 
 /**
  * a small class to manage loading of stuff and manage resources
@@ -30,7 +30,7 @@ export let nocache = "";
 /**
  * @type {Object.<string, string>}
  */
-export let baseURL = {};
+export const baseURL = {};
 
 /**
  * crossOrigin attribute to configure the CORS requests for Image and Video data element.
@@ -179,7 +179,7 @@ export let onError;
 /**
  * list of parser function for supported format type
  */
-let parsers = new Map();
+const parsers = new Map();
 
 /**
  * keep track if parsers were registered
@@ -225,7 +225,7 @@ function checkLoadStatus(onloadcb) {
 			clearTimeout(timerId);
 			// trigger the onload callback
 			// we call either the supplied callback (which takes precedence) or the global one
-			let callback = onloadcb || onload;
+			const callback = onloadcb || onload;
 			setTimeout(() => {
 				callback();
 				event.emit(event.LOADER_COMPLETE);
@@ -250,7 +250,7 @@ function onResourceLoaded(res) {
 	loadCount++;
 
 	// currrent progress
-	let progress = loadCount / resourceCount;
+	const progress = loadCount / resourceCount;
 
 	// call callback if defined
 	if (typeof onProgress === "function") {
@@ -484,7 +484,7 @@ export function load(asset, onload, onerror) {
 		asset.src = baseURL[asset.type] + asset.src;
 	}
 
-	let parser = parsers.get(asset.type);
+	const parser = parsers.get(asset.type);
 
 	if (typeof parser === "undefined") {
 		throw new Error("load : unknown or invalid resource type : " + asset.type);
@@ -682,7 +682,7 @@ export function getBinary(elt) {
  */
 export function getImage(image) {
 	// force as string and extract the base name
-	image = fileUtil.getBasename("" + image);
+	image = getBasename("" + image);
 	if (image in imgList) {
 		// return the corresponding Image object
 		return imgList[image];

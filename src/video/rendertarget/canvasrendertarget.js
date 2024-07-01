@@ -1,5 +1,5 @@
 import { createCanvas } from "../video.js";
-import { setPrefixed } from "../../utils/agent.js";
+import { setPrefixed } from "../../utils/agent.ts";
 import { clamp } from "../../math/math.js";
 
 /**
@@ -9,7 +9,7 @@ import { clamp } from "../../math/math.js";
  */
 
 // default canvas settings
-let defaultAttributes = {
+const defaultAttributes = {
 	offscreenCanvas: false,
 	willReadFrequently: false,
 	antiAlias: false,
@@ -36,7 +36,7 @@ function createContext(canvas, attributes) {
 			willReadFrequently: attributes.willReadFrequently,
 		});
 	} else if (attributes.context === "webgl") {
-		let attr = {
+		const attr = {
 			alpha: attributes.transparent,
 			antialias: attributes.antiAlias,
 			depth: attributes.depth,
@@ -96,14 +96,13 @@ class CanvasRenderTarget {
 		 * the canvas created for this CanvasRenderTarget
 		 * @type {HTMLCanvasElement|OffscreenCanvas}
 		 */
-		this.canvas;
+		// this.canvas;
 
 		/**
 		 * the rendering context of this CanvasRenderTarget
 		 * @type {CanvasRenderingContext2D|WebGLRenderingContext}
 		 */
-		this.context;
-
+		// this.context;
 		// clean up the given attributes
 		this.attributes = Object.assign({}, defaultAttributes, attributes);
 
@@ -153,7 +152,7 @@ class CanvasRenderTarget {
 	 * @param {boolean} [enable=false] - whether to enable or not image smoothing (scaling interpolation)
 	 */
 	setAntiAlias(enable = false) {
-		let canvas = this.canvas;
+		const canvas = this.canvas;
 
 		// enable/disable antialias on the given Context2d object
 		setPrefixed("imageSmoothingEnabled", enable, this.context);
@@ -215,9 +214,9 @@ class CanvasRenderTarget {
 	 */
 	toBlob(type = "image/png", quality) {
 		if (typeof this.canvas.convertToBlob === "function") {
-			return this.canvas.convertToBlob(type, quality);
+			return this.canvas.convertToBlob({ type, quality });
 		} else {
-			return new Promise(function (resolve) {
+			return new Promise((resolve) => {
 				this.canvas.toBlob(
 					(blob) => {
 						resolve(blob);
@@ -242,7 +241,7 @@ class CanvasRenderTarget {
 			if (typeof this.canvas.transferToImageBitmap === "function") {
 				resolve(this.canvas.transferToImageBitmap());
 			} else {
-				let image = new Image();
+				const image = new Image();
 				image.src = this.canvas.toDataURL(type, quality);
 				image.onload = () => {
 					globalThis.createImageBitmap(image).then((bitmap) => resolve(bitmap));

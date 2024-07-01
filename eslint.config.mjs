@@ -1,19 +1,17 @@
 import jsdoc from "eslint-plugin-jsdoc";
-import stylistic from "@stylistic/eslint-plugin";
 import globals from "globals";
+import tseslint from "typescript-eslint";
+import eslint from "@eslint/js";
 
-/** @type {import('eslint').Linter.FlatConfig[]} */
-export default [
+const jsDocConfig = jsdoc.configs["flat/recommended-typescript-error"];
+
+export default tseslint.config(
+	eslint.configs.recommended,
+	...tseslint.configs.recommended,
 	{
 		name: "eslint/global-ignores",
 		// globally ignore below directories and files
-		ignores: [
-			"*.config.mjs",
-			"dist/**/*",
-			"build/**/*",
-			"tests/**/*",
-			"docs/**/*",
-		],
+		ignores: ["build", "docs/**/*", "rollup.config.mjs", "scripts/build.js"],
 	},
 	{
 		name: "eslint/global-rules",
@@ -24,10 +22,9 @@ export default [
 				...globals.browser,
 			},
 		},
-		files: ["src/**/*.js"],
+		files: ["src/**/*.js", "src/**/*.ts", "tests/**/*.js"],
 		plugins: {
 			jsdoc,
-			"@stylistic": stylistic,
 		},
 		rules: {
 			// http://eslint.org/docs/rules/
@@ -66,10 +63,7 @@ export default [
 			"no-labels": ["error", { allowLoop: false, allowSwitch: false }],
 			"no-lone-blocks": "error",
 			"no-loss-of-precision": "error",
-			"no-mixed-spaces-and-tabs": "error",
-			"no-multi-spaces": ["off", { ignoreEOLComments: true }],
 			"no-multi-str": "error",
-			"no-multiple-empty-lines": ["off", { max: 1 }],
 			"no-native-reassign": "error",
 			"no-negated-in-lhs": "error",
 			"no-new": "error",
@@ -90,6 +84,7 @@ export default [
 			"no-this-before-super": "error",
 			"no-throw-literal": "off",
 			"no-trailing-spaces": "error",
+			"no-undef": "error",
 			"no-undef-init": "error",
 			"no-unmodified-loop-condition": "error",
 			"no-unneeded-ternary": ["off", { defaultAssignment: false }],
@@ -145,17 +140,16 @@ export default [
 			yoda: ["error", "never"],
 			"jsdoc/require-hyphen-before-param-description": "error",
 			"jsdoc/no-undefined-types": "off",
-
-			// https://eslint.style/rules
-			"@stylistic/arrow-spacing": ["error", { before: true, after: true }],
-			"@stylistic/block-spacing": ["error", "always"],
-			"@stylistic/brace-style": ["off", "1tbs", { allowSingleLine: true }],
-			"@stylistic/comma-spacing": ["error", { before: false, after: true }],
-			"@stylistic/comma-style": ["error", "last"],
-			"@stylistic/semi": ["error", "always"],
-			"@stylistic/dot-location": ["error", "property"],
-			"@stylistic/eol-last": ["error"],
-			"@stylistic/linebreak-style": ["error", "unix"],
 		},
 	},
-];
+	{
+		...jsDocConfig,
+		files: ["**/*.{ts,tsx,mts,cts}"],
+		rules: {
+			"no-undef": "off",
+			"no-unused-vars": "off",
+			"@typescript-eslint/no-explicit-any": "off",
+			...jsDocConfig.rules,
+		},
+	},
+);
